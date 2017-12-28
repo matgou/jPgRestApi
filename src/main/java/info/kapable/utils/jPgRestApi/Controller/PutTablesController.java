@@ -11,15 +11,20 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response;
+import info.kapable.utils.jPgRestApi.ResponseFactory;
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 public class PutTablesController extends Controller {
 	private static final Logger LOG = LoggerFactory.getLogger(PutTablesController.class);
 
 	@Override
-	public Response process(String uri, Map<String, String> headers, Map<String, String> parms, InputStream data) {
+	public Response process(String uri, Map<String, String> headers, Map<String, String> parms, InputStream data) throws RequestBodyException {
 		Map<String,Object> dataObject = parseJson(headers, data);
+		this.testNotNull(dataObject);
+		this.testContains("name", dataObject);
+		this.testContains("column", dataObject);
+		
 		LOG.info("data : " + dataObject);
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("CREATE TABLE ");
@@ -38,10 +43,11 @@ public class PutTablesController extends Controller {
 		// Commit query
 		try {
 			this.DB.query(queryString.toString());
+			
 		} catch(SQLException e) {
 			LOG.error("Error in sql processing", e);
-			return null;
+			return ResponseFactory.newSQLError(e);
 		}
-		return NanoHTTPD.newFixedLengthResponse("<html><body>"+dataObject+"</body></html>\n");
+		return ResponseFactory.newSuccessMessage();
 	}
 }

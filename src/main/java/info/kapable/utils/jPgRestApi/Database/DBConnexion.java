@@ -76,10 +76,9 @@ public class DBConnexion {
 		this.password = password;
 	}
 
-	public void query(String sql) throws SQLException {
+	public ResultSet query(String sql) throws SQLException {
 	    Statement state = conn.createStatement();
-	    ResultSet result = state.executeQuery(sql);
-	    ResultSetMetaData resultMeta = result.getMetaData();
+	    return state.executeQuery(sql);
 	}
 	
 	

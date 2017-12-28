@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fi.iki.elonen.NanoHTTPD.Response;
 import info.kapable.utils.jPgRestApi.Database.DBConnexion;
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 public abstract class Controller {
 	private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
@@ -21,7 +22,7 @@ public abstract class Controller {
 	protected DBConnexion DB;
 	
 	public abstract Response process(String uri, Map<String, String> headers,
-			Map<String, String> parms, InputStream data);
+			Map<String, String> parms, InputStream data) throws RequestBodyException;
 	
 	public Controller() {
 		try {
@@ -47,6 +48,13 @@ public abstract class Controller {
 		return null;
 	}
 	
+	/**
+	 * Return Map from JSON Request body
+	 * 
+	 * @param headers
+	 * @param data
+	 * @return
+	 */
 	protected Map<String, Object> parseJson(Map<String, String> headers, InputStream data) {
 		String dataString = this.parseData(headers, data);
 		LOG.debug("Data : " + dataString);
@@ -63,4 +71,26 @@ public abstract class Controller {
 		}
 		return null;
 	}
+	
+	/**
+	 * Test if object is not null
+	 * @param dataObject
+	 */
+	protected void testNotNull(Map<String, Object> dataObject) throws RequestBodyException {
+		if(dataObject == null) {
+			throw new RequestBodyException("object is null");
+		}
+	}
+	
+	/**
+	 * Test if object contains specified key
+	 * @param dataObject
+	 */
+	protected void testContains(String text, Map<String, Object> dataObject) throws RequestBodyException {
+		if(!dataObject.containsKey(text)) {
+			throw new RequestBodyException(text + " is missing");
+		}
+	}
+	
+	
 }

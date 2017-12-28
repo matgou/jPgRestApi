@@ -15,6 +15,8 @@ import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 import info.kapable.utils.jPgRestApi.Application;
 import info.kapable.utils.jPgRestApi.Configuration;
+import info.kapable.utils.jPgRestApi.ResponseFactory;
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 public class ControllerEngine {
 
@@ -78,7 +80,12 @@ public class ControllerEngine {
 		controllerKey = this.findControllerKey(controllerKey, controllerKey, method, uri);
 		LOG.debug("Using controller : " + controllerKey);
 		
-		return this.controllers.get(controllerKey).process(uri, headers, parms, data);
+		try {
+			return this.controllers.get(controllerKey).process(uri, headers, parms, data);
+		} catch (RequestBodyException e) {
+			LOG.error("Error in request : ",e);
+			return ResponseFactory.newBadRequestException(e);
+		}
 	}
 
 	private String findControllerKey(String currentControllerKey, String controllerKey, Method method, String uri) {
