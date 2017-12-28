@@ -1,11 +1,9 @@
 package info.kapable.utils.jPgRestApi;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -33,25 +31,24 @@ public class Configuration {
 	 */
 	private Configuration() {
 		LOG.debug("Load configuration ...");
-		InputStream input = null;
-		URL configtUrl = Configuration.class
-                .getClassLoader().getResource("config.properties");
+		InputStream configMain = null;
 		try {
-	        File configFile = new File(configtUrl.toURI());
-			input = new FileInputStream(configFile);
+			configMain = Configuration.class
+	                .getClassLoader().getResourceAsStream("config.properties");
 
 			// load a properties file
-			this.prop.load(input);
+			this.prop.load(configMain);
 
-		} catch (IOException | URISyntaxException ex) {
+		} catch (IOException ex) {
 			LOG.error("Error when loading : config.properties", ex);
 			Application.exit(255);
 		} finally {
-			if (input != null) {
+			if (configMain != null) {
 				try {
-					input.close();
+					configMain.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOG.error("Error when loading : config.properties", e);
+					Application.exit(255);
 				}
 			}
 		}
@@ -64,5 +61,22 @@ public class Configuration {
     public static Configuration getInstance()
     {   return INSTANCE;
     }
+
+	public String get(String string) {
+		return this.prop.getProperty(string);
+	}
+
+	public Map<String, String> getAll(String string) {
+		Map<String, String> returnMap = new HashMap<String, String>();
+		for (Object keyObj : this.prop.keySet()) {
+			String key = (String) keyObj;
+		    if (!key.startsWith(string))
+		        continue;
+		    
+		    String value = (String) this.prop.get(key);
+		    returnMap.put(key, value);
+		}
+		return returnMap;
+	}
 	
 }

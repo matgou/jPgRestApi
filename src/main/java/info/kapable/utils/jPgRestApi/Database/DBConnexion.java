@@ -1,14 +1,43 @@
 package info.kapable.utils.jPgRestApi.Database;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import info.kapable.utils.jPgRestApi.Configuration;
+
 /**
  * This class represent a persistant connection to database
  * @author mgoulin
  *
  */
 public class DBConnexion {
+	private static DBConnexion INSTANCE;
+	
 	private String jdbcString;
 	private String username;
 	private String password;
+
+	private Connection conn;
+	
+	private DBConnexion(String jdbcString, String jdbcUser, String jdbcPassword) throws SQLException {
+		this.jdbcString = jdbcString;
+		this.username = jdbcUser;
+		this.password = jdbcPassword;
+		
+	    conn = DriverManager.getConnection(this.jdbcString, this.username, this.password);
+	}
+
+	public static DBConnexion getInstance() throws SQLException {
+		if(INSTANCE == null) {
+			Configuration config = Configuration.getInstance();
+			INSTANCE = new DBConnexion(config.get("jdbcString"), config.get("jdbcUser"), config.get("jdbcPassword"));
+		}
+		return INSTANCE;
+	}
 	
 	/**
 	 * @return the jdbcString
@@ -45,6 +74,12 @@ public class DBConnexion {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public void query(String sql) throws SQLException {
+	    Statement state = conn.createStatement();
+	    ResultSet result = state.executeQuery(sql);
+	    ResultSetMetaData resultMeta = result.getMetaData();
 	}
 	
 	
