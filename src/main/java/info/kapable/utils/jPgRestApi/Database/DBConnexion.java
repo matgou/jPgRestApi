@@ -7,6 +7,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.kapable.utils.jPgRestApi.Application;
 import info.kapable.utils.jPgRestApi.Configuration;
 
 /**
@@ -15,6 +19,8 @@ import info.kapable.utils.jPgRestApi.Configuration;
  *
  */
 public class DBConnexion {
+	private static final Logger LOG = LoggerFactory.getLogger(DBConnexion.class);
+
 	private static DBConnexion INSTANCE;
 	
 	private String jdbcString;
@@ -77,6 +83,7 @@ public class DBConnexion {
 	}
 
 	public ResultSet query(String sql) throws SQLException {
+		LOG.debug("Executing query : " + sql);
 	    Statement state = conn.createStatement();
 	    return state.executeQuery(sql);
 	}

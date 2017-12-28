@@ -2,6 +2,7 @@ package info.kapable.utils.jPgRestApi;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -75,6 +76,31 @@ public class ResponseFactory {
 			String jsonString = objectMapper.writeValueAsString(object);
 			LOG.debug("Response (" + status.toString() + ") => " + jsonString);
 			return NanoHTTPD.newFixedLengthResponse(status, "application/json", jsonString);
+		} catch (JsonProcessingException e) {
+			LOG.error("Error in JsonProcessing", e);
+		}
+		return null;
+	}
+
+	public static Response generateResponse(IStatus status, List<Object> object) {
+		try {
+			String jsonString = objectMapper.writeValueAsString(object);
+			LOG.debug("Response (" + status.toString() + ") => " + jsonString);
+			return NanoHTTPD.newFixedLengthResponse(status, "application/json", jsonString);
+		} catch (JsonProcessingException e) {
+			LOG.error("Error in JsonProcessing", e);
+		}
+		return null;
+	}
+
+	public static Response generateNotImplementedResponse() {
+	    Map<String, Object> errorObject = new HashMap<String,Object>();
+	    errorObject.put("ErrorString", "Not Implemented");
+
+		String jsonString;
+		try {
+			jsonString = objectMapper.writeValueAsString(errorObject);
+			return NanoHTTPD.newFixedLengthResponse(Status.NOT_IMPLEMENTED, "application/json", jsonString);
 		} catch (JsonProcessingException e) {
 			LOG.error("Error in JsonProcessing", e);
 		}
