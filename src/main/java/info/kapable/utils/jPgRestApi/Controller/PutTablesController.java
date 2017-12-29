@@ -1,5 +1,7 @@
 package info.kapable.utils.jPgRestApi.Controller;
 
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
+
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.iki.elonen.NanoHTTPD.Response;
-import info.kapable.utils.jPgRestApi.ResponseFactory;
-import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 public class PutTablesController extends Controller {
 	private static final Logger LOG = LoggerFactory.getLogger(PutTablesController.class);

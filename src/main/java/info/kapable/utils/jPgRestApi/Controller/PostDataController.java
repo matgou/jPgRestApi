@@ -1,25 +1,19 @@
 package info.kapable.utils.jPgRestApi.Controller;
 
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
+
 import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.iki.elonen.NanoHTTPD.Response;
-import fi.iki.elonen.NanoHTTPD.Response.Status;
-import info.kapable.utils.jPgRestApi.Application;
-import info.kapable.utils.jPgRestApi.ResponseFactory;
-import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 /**
  * This controller return data from database with select query
@@ -42,6 +36,14 @@ public class PostDataController extends Controller {
 		throw new RequestBodyException("Invalid uri");
 	}
 
+	/**
+	 * Insert data in tableName from input
+	 * 
+	 * @param tableName
+	 * @param parms
+	 * @param data
+	 * @return
+	 */
 	private Response insertData(String tableName, Map<String, String> parms, Map<String,Object> data) {
 		try {
 			List<String> columns = new ArrayList<String>();

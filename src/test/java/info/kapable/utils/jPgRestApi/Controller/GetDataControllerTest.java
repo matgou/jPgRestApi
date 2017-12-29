@@ -164,6 +164,7 @@ public class GetDataControllerTest extends ApplicationTest {
 		            = new TypeReference<List<Object>>() {};
 			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
 
+			@SuppressWarnings("unchecked")
 			Map<String, Object> object = (Map<String, Object>) jsonList.get(0);
 			assertThat((String) object.get("DESCRIPTION"), containsString("world4"));
 			

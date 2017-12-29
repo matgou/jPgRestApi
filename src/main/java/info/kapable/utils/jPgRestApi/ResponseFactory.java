@@ -1,5 +1,7 @@
 package info.kapable.utils.jPgRestApi;
 
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -17,7 +19,6 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
-import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 /**
  * Static method to convert object to Response
