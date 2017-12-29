@@ -1,5 +1,7 @@
 package info.kapable.utils.jPgRestApi;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -20,7 +22,7 @@ public class Configuration {
 	/**
 	 * Singleton
 	 */
-	private static Configuration INSTANCE = new Configuration();
+	private static Configuration INSTANCE;
 	/**
 	 * Properties databases
 	 */
@@ -59,7 +61,11 @@ public class Configuration {
 	 * @return
 	 */
     public static Configuration getInstance()
-    {   return INSTANCE;
+    {
+    	if(INSTANCE == null) {
+    		INSTANCE = new Configuration();
+    	}
+    	return INSTANCE;
     }
 
 	public String get(String string) {
@@ -77,6 +83,31 @@ public class Configuration {
 		    returnMap.put(key, value);
 		}
 		return returnMap;
+	}
+
+	/**
+	 * Override properties with propertiesFilePath
+	 * 
+	 * @param propertiesFilePath
+	 */
+	public void addConfig(String propertiesFilePath) {
+		try {
+			Properties customProp = new Properties();
+			customProp.load(new FileInputStream(propertiesFilePath));
+			// Merge
+			Properties merged = new Properties();
+			merged.putAll(this.prop);
+			merged.putAll(customProp);
+			
+			this.prop = merged;
+		} catch (FileNotFoundException e) {
+			LOG.error("Unable to find : " + propertiesFilePath, e);
+			Application.exit(255);
+		} catch (IOException e) {
+			LOG.error("Unable to open : " + propertiesFilePath, e);
+			Application.exit(255);
+		}
+
 	}
 	
 }

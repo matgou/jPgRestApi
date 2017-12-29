@@ -36,7 +36,12 @@ public class DBConnexion {
 		this.jdbcString = jdbcString;
 		this.username = jdbcUser;
 		this.password = jdbcPassword;
-		
+		LOG.info("Connect to " + this.jdbcString);
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	    conn = DriverManager.getConnection(this.jdbcString, this.username, this.password);
 	}
 

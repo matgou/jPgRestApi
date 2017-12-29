@@ -6,6 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +28,7 @@ public class Application extends NanoHTTPD {
 	
 	private static Application application;
 	private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-	private ControllerEngine controllerEngine = new ControllerEngine();
+	private ControllerEngine controllerEngine;
 	 
 	/**
 	 * Entry point to start application
@@ -44,13 +51,34 @@ public class Application extends NanoHTTPD {
 	 * Run application
 	 */
 	public void Run(String[] args) {
+	    CommandLineParser parser = new DefaultParser();
+		Options options = new Options();
+		Option config = Option.builder("c")
+			    .longOpt( "config" )
+			    .desc( "use custom properties file" )
+			    .hasArg()
+			    .argName( "CONFIG" )
+			    .build();
+		options.addOption(config);
+		
         try {
-			start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-			
-			LOG.info("Running! Point your browsers to http://localhost:8080/ ");
-		} catch (IOException e) {
-			LOG.error("IOException => ", e);
-			Application.exit(0);
+			CommandLine line = parser.parse( options, args );
+			if( line.hasOption( "config" ) ) {
+				// use specific properties
+				Configuration.getInstance().addConfig(line.getOptionValue( "config" ));
+			}
+	        try {
+	        	this.controllerEngine = new ControllerEngine();
+				start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+				
+				LOG.info("Running! Point your browsers to http://localhost:8080/ ");
+			} catch (IOException e) {
+				LOG.error("IOException => ", e);
+				Application.exit(0);
+			}
+		} catch (ParseException e1) {
+			LOG.error("ParseException => ", e1);
+			Application.exit(255);
 		}
 	}
 
