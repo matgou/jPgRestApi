@@ -46,6 +46,7 @@ public class PostDataController extends Controller {
 	 */
 	private Response insertData(String tableName, Map<String, String> parms, Map<String,Object> data) {
 		try {
+			LOG.debug("insert data");
 			List<String> columns = new ArrayList<String>();
 			List<String> values = new ArrayList<String>();
 			
