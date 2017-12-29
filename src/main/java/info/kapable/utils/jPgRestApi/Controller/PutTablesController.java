@@ -46,8 +46,8 @@ public class PutTablesController extends Controller {
 			
 		} catch(SQLException e) {
 			LOG.error("Error in sql processing", e);
-			return ResponseFactory.newSQLError(e);
+			return RESPONSE_FACTORY.newSQLError(e);
 		}
-		return ResponseFactory.newSuccessMessage();
+		return RESPONSE_FACTORY.newSuccessMessage();
 	}
 }

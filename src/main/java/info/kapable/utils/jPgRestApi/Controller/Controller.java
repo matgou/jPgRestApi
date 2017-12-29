@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fi.iki.elonen.NanoHTTPD.Response;
+import info.kapable.utils.jPgRestApi.ResponseFactory;
 import info.kapable.utils.jPgRestApi.Database.DBConnexion;
 import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
@@ -20,6 +21,8 @@ public abstract class Controller {
 	private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
 	protected DBConnexion DB;
+
+	protected ResponseFactory RESPONSE_FACTORY;
 	
 	public abstract Response process(String uri, Map<String, String> headers,
 			Map<String, String> parms, InputStream data) throws RequestBodyException;
@@ -30,6 +33,8 @@ public abstract class Controller {
 		} catch (SQLException e){
 			LOG.error("SQLException in connexion to database : ", e);
 		}
+		
+		this.RESPONSE_FACTORY = ResponseFactory.getInstance();
 	}
 	/**
 	 * Return string from data

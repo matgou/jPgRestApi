@@ -1,6 +1,7 @@
 package info.kapable.utils.jPgRestApi;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response;
@@ -23,9 +25,25 @@ import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
  */
 public class ResponseFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(ResponseFactory.class);
-	
+
+	// Singleton
+	private static ResponseFactory INSTANCE = new ResponseFactory();
+
 	// ObjectMapper
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
+    
+    /**
+     * Constructor to init objectMapper
+     */
+    private ResponseFactory() {
+    	objectMapper = new ObjectMapper();
+    	objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+    }
+    
+    public static ResponseFactory getInstance() {
+    	return INSTANCE;
+    }
     
 	/**
 	 * From Exception return FixedLenghtResponse
@@ -33,7 +51,7 @@ public class ResponseFactory {
 	 * @param e
 	 * @return
 	 */
-	public static Response newSQLError(SQLException e) {
+	public Response newSQLError(SQLException e) {
 	    Map<String, Object> errorObject = new HashMap<String,Object>();
 	    errorObject.put("ErrorString", e.getMessage());
 
@@ -45,7 +63,7 @@ public class ResponseFactory {
 	 * 
 	 * @return
 	 */
-	public static Response newSuccessMessage() {
+	public Response newSuccessMessage() {
 	    Map<String, Object> confirmObject = new HashMap<String,Object>();
 	    confirmObject.put("Message", "Operation performed");
 		return generateResponse(Status.OK, confirmObject);
@@ -57,7 +75,7 @@ public class ResponseFactory {
 	 * @param e
 	 * @return
 	 */
-	public static Response newBadRequestException(RequestBodyException e) {
+	public Response newBadRequestException(RequestBodyException e) {
 	    Map<String, Object> errorObject = new HashMap<String,Object>();
 	    errorObject.put("ErrorString", e.getMessage());
 
@@ -71,7 +89,7 @@ public class ResponseFactory {
 	 * @param object
 	 * @return
 	 */
-	public static Response generateResponse(IStatus status, Map<String, Object> object) {
+	public Response generateResponse(IStatus status, Map<String, Object> object) {
 		try {
 			String jsonString = objectMapper.writeValueAsString(object);
 			LOG.debug("Response (" + status.toString() + ") => " + jsonString);
@@ -82,7 +100,7 @@ public class ResponseFactory {
 		return null;
 	}
 
-	public static Response generateResponse(IStatus status, List<Object> object) {
+	public Response generateResponse(IStatus status, List<Object> object) {
 		try {
 			String jsonString = objectMapper.writeValueAsString(object);
 			LOG.debug("Response (" + status.toString() + ") => " + jsonString);
@@ -93,7 +111,7 @@ public class ResponseFactory {
 		return null;
 	}
 
-	public static Response generateNotImplementedResponse() {
+	public Response generateNotImplementedResponse() {
 	    Map<String, Object> errorObject = new HashMap<String,Object>();
 	    errorObject.put("ErrorString", "Not Implemented");
 

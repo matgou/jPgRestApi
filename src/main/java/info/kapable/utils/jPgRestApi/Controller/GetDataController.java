@@ -34,7 +34,7 @@ public class GetDataController extends Controller {
 			return this.getAllData(uriParts[2], parms);
 		}
 		
-		return ResponseFactory.generateNotImplementedResponse();
+		return RESPONSE_FACTORY.generateNotImplementedResponse();
 	}
 
 	private Response getAllData(String tableName, Map<String, String> parms) {
@@ -49,6 +49,8 @@ public class GetDataController extends Controller {
 				for(int i = 1; i <= metadata.getColumnCount(); i++) {
 					if (metadata.getColumnType(i) == java.sql.Types.INTEGER) {
 						aData.put(metadata.getColumnLabel(i), data.getInt(i));
+					} else if (metadata.getColumnType(i) == java.sql.Types.DATE) {
+						aData.put(metadata.getColumnLabel(i), data.getDate(i));
 					} else {
 						aData.put(metadata.getColumnLabel(i), data.getString(i));
 					}
@@ -56,9 +58,9 @@ public class GetDataController extends Controller {
 				allData.add(aData);
 			}
 			
-			return ResponseFactory.generateResponse(Status.OK, allData);
+			return RESPONSE_FACTORY.generateResponse(Status.OK, allData);
 		} catch (SQLException e) {
-			ResponseFactory.newSQLError(e);
+			RESPONSE_FACTORY.newSQLError(e);
 		}
 		return null;
 	}

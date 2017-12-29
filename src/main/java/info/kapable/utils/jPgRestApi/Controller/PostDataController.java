@@ -61,9 +61,9 @@ public class PostDataController extends Controller {
 
 			this.DB.query("INSERT INTO " + tableName + " (" + String.join(", ", columns) + ") VALUES (" + String.join(", ", values) + ")");
 			
-			return ResponseFactory.newSuccessMessage();
+			return RESPONSE_FACTORY.newSuccessMessage();
 		} catch (SQLException e) {
-			ResponseFactory.newSQLError(e);
+			RESPONSE_FACTORY.newSQLError(e);
 		}
 		return null;
 	}

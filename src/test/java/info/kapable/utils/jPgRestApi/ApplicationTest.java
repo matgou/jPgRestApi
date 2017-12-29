@@ -54,7 +54,8 @@ public class ApplicationTest {
 					+ "\"name\": \"" + tableName + "\", " 
 					+ "\"column\": {"
 					+ "		\"id\":\"INTEGER NOT NULL\"," 
-					+ "		\"description\":\"VARCHAR(25)\"" 
+					+ "		\"description\":\"VARCHAR(25)\"," 
+					+ "     \"submission_date\": \"DATE\""
 					+ "}" 
 					+ "}");
 
@@ -67,13 +68,14 @@ public class ApplicationTest {
 		}
 	}
 
-	protected void InsertData(String tableName, int i, String string) {
+	protected void InsertData(String tableName, int id, String description, String date) {
 	    client = HttpClients.createDefault();
 		HttpPost postRequest = new HttpPost("http://localhost:8080/data/" + tableName);
 		try {
 			StringEntity input = new StringEntity("{" 
-					+ "\"description\": \"" + string + "\", "
-					+ "\"id\": " + i 
+					+ "\"description\": \"" + description + "\", "
+					+ "\"id\": " + id + ","
+					+ "\"submission_date\": \"" + date + "\" "
 					+ "}");
 
 			input.setContentType("application/json");

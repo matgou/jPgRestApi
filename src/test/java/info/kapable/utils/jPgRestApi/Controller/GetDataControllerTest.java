@@ -4,14 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.junit.Before;
 import org.junit.Test;
 
 import info.kapable.utils.jPgRestApi.ApplicationTest;
@@ -29,8 +25,8 @@ public class GetDataControllerTest extends ApplicationTest {
 	@Test
 	public void getAllDataTest() {
 		CreateTable("table_test");
-		InsertData("table_test", 1, "hello");
-		InsertData("table_test", 2, "world");
+		InsertData("table_test", 1, "hello", "2012-12-12");
+		InsertData("table_test", 2, "world", "2011-12-12");
 		try {
 			HttpGet getRequest = new HttpGet(url + "/table_test");
 			HttpResponse response = client.execute(getRequest);

@@ -84,7 +84,7 @@ public class ControllerEngine {
 			return this.controllers.get(controllerKey).process(uri, headers, parms, data);
 		} catch (RequestBodyException e) {
 			LOG.error("Error in request : ",e);
-			return ResponseFactory.newBadRequestException(e);
+			return ResponseFactory.getInstance().newBadRequestException(e);
 		}
 	}
 
