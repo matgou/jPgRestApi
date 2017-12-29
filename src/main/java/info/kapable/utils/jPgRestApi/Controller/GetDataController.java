@@ -1,11 +1,12 @@
 package info.kapable.utils.jPgRestApi.Controller;
 
+import info.kapable.utils.jPgRestApi.Configuration;
+import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
+
 import java.io.InputStream;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
-import info.kapable.utils.jPgRestApi.Application;
-import info.kapable.utils.jPgRestApi.ResponseFactory;
-import info.kapable.utils.jPgRestApi.Exception.RequestBodyException;
 
 /**
  * This controller return data from database with select query
@@ -48,9 +46,11 @@ public class GetDataController extends Controller {
 	 */
 	private Response getAllData(String tableName, Map<String, String> parms) {
 		try {
+			LOG.debug(" getAllData on table " + tableName);
 			// Extract from parms condition as SQL 
 			List<String> conditionsSQL = new ArrayList<String>();
 			String orderBySQL = "";
+			int resLimit = Integer.parseInt(Configuration.getInstance().get("default.max_rows"));
 			Iterator<Entry<String, String>> it = parms.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<String, String> e = it.next();
@@ -60,8 +60,10 @@ public class GetDataController extends Controller {
 					} else {
 						conditionsSQL.add(e.getKey() + " = '" + e.getValue() + "'");
 					}
-				} else if(!e.getKey().contentEquals("_orderby")) {
+				} else if(e.getKey().contentEquals("_orderby")) {
 					orderBySQL = " ORDER BY " + e.getValue();
+				} else if(e.getKey().contentEquals("_limit")) {
+					resLimit = Integer.parseInt(e.getValue());
 				}
 			}
 
@@ -76,7 +78,7 @@ public class GetDataController extends Controller {
 			sql = sql + orderBySQL;
 			
 			// perform query
-			ResultSet data = this.DB.query(sql);
+			ResultSet data = this.DB.query(sql, resLimit);
 			
 			// convert resultSet to List object
 			List<Object> allData = this.DB.resultSetToList(data);

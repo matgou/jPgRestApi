@@ -115,4 +115,65 @@ public class GetDataControllerTest extends ApplicationTest {
 			fail("IOException");
 		}
 	}
+	
+	@Test
+	public void getLimitDataTest() {
+		CreateTable("table_test_limit_data");
+		InsertData("table_test_limit_data", 1, "hello", "2012-12-12");
+		InsertData("table_test_limit_data", 2, "world", "2011-12-12");
+		InsertData("table_test_limit_data", 3, "world1", "2011-12-12");
+		InsertData("table_test_limit_data", 4, "world2", "2011-12-12");
+		InsertData("table_test_limit_data", 5, "world3", "2011-12-12");
+		InsertData("table_test_limit_data", 6, "world4", "2011-12-12");
+		try {
+			HttpGet getRequest = new HttpGet(url + "/table_test_limit_data?_limit=3");
+			HttpResponse response = client.execute(getRequest);
+			assertEquals(response.getStatusLine().getStatusCode(), 200);
+			ObjectMapper mapper = new ObjectMapper();
+
+		    TypeReference<List<Object>> typeRef 
+		            = new TypeReference<List<Object>>() {};
+			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
+			assertEquals(jsonList.size(), 3);
+			
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			fail("ClientProtocolException");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IOException");
+		}
+	}
+
+	@Test
+	public void getOrderByDataTest() {
+		CreateTable("table_order_by_data");
+		InsertData("table_order_by_data", 1, "hello", "2012-12-12");
+		InsertData("table_order_by_data", 2, "world", "2011-12-12");
+		InsertData("table_order_by_data", 3, "world1", "2011-12-12");
+		InsertData("table_order_by_data", 4, "world2", "2011-12-12");
+		InsertData("table_order_by_data", 5, "world3", "2011-12-12");
+		InsertData("table_order_by_data", 6, "world4", "2011-12-12");
+		try {
+			HttpGet getRequest = new HttpGet(url + "/table_order_by_data?_orderby=id%20desc");
+			HttpResponse response = client.execute(getRequest);
+			assertEquals(response.getStatusLine().getStatusCode(), 200);
+			ObjectMapper mapper = new ObjectMapper();
+
+		    TypeReference<List<Object>> typeRef 
+		            = new TypeReference<List<Object>>() {};
+			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
+
+			Map<String, Object> object = (Map<String, Object>) jsonList.get(0);
+			assertThat((String) object.get("DESCRIPTION"), containsString("world4"));
+			
+			
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			fail("ClientProtocolException");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IOException");
+		}
+	}
 }

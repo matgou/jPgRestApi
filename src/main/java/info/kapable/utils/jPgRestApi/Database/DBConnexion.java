@@ -87,11 +87,17 @@ public class DBConnexion {
 	}
 
 	public ResultSet query(String sql) throws SQLException {
-		LOG.debug("Executing query : " + sql);
-	    Statement state = conn.createStatement();
-	    return state.executeQuery(sql);
+		int resLimit = Integer.parseInt(Configuration.getInstance().get("default.max_rows"));
+		return query(sql, resLimit);
 	}
 
+	public ResultSet query(String sql, int resLimit) throws SQLException {
+		LOG.debug("Executing query : " + sql);
+	    Statement state = conn.createStatement();
+	    state.setMaxRows(resLimit);
+	    return state.executeQuery(sql);
+	}
+	
 	/**
 	 * Convert a SQL ResultSet to a List
 	 * 
