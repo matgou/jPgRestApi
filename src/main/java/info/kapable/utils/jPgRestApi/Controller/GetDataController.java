@@ -6,8 +6,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,35 +36,55 @@ public class GetDataController extends Controller {
 			return this.getAllData(uriParts[2], parms);
 		}
 		
-		return RESPONSE_FACTORY.generateNotImplementedResponse();
+		return responseFactory.generateNotImplementedResponse();
 	}
 
+	/**
+	 * Return all data from table
+	 * 
+	 * @param tableName the tablename to query
+	 * @param parms query parameters
+	 * @return
+	 */
 	private Response getAllData(String tableName, Map<String, String> parms) {
 		try {
-			List<Object> allData = new ArrayList<Object>();
-			
-			ResultSet data = this.DB.query("SELECT * FROM " + tableName);
-			ResultSetMetaData metadata = data.getMetaData();
-			
-			while(data.next()) {
-				Map<String, Object> aData = new HashMap<String, Object>();
-				for(int i = 1; i <= metadata.getColumnCount(); i++) {
-					if (metadata.getColumnType(i) == java.sql.Types.INTEGER) {
-						aData.put(metadata.getColumnLabel(i), data.getInt(i));
-					} else if (metadata.getColumnType(i) == java.sql.Types.DATE) {
-						aData.put(metadata.getColumnLabel(i), data.getDate(i));
+			// Extract from parms condition as SQL 
+			List<String> conditionsSQL = new ArrayList<String>();
+			String orderBySQL = "";
+			Iterator<Entry<String, String>> it = parms.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, String> e = it.next();
+				if(!e.getKey().startsWith("_")) {
+					if(e.getValue().contains("%")) {
+						conditionsSQL.add(e.getKey() + " LIKE '" + e.getValue() + "'");
 					} else {
-						aData.put(metadata.getColumnLabel(i), data.getString(i));
+						conditionsSQL.add(e.getKey() + " = '" + e.getValue() + "'");
 					}
+				} else if(!e.getKey().contentEquals("_orderby")) {
+					orderBySQL = " ORDER BY " + e.getValue();
 				}
-				allData.add(aData);
+			}
+
+			String sql = "SELECT * FROM " + tableName;
+			
+			// Add condition if present
+			if(conditionsSQL.size() > 0) {
+				sql = sql + " WHERE " + String.join(" AND ", conditionsSQL);
 			}
 			
-			return RESPONSE_FACTORY.generateResponse(Status.OK, allData);
+			// Add order by
+			sql = sql + orderBySQL;
+			
+			// perform query
+			ResultSet data = this.DB.query(sql);
+			
+			// convert resultSet to List object
+			List<Object> allData = this.DB.resultSetToList(data);
+			
+			return responseFactory.generateResponse(Status.OK, allData);
 		} catch (SQLException e) {
-			RESPONSE_FACTORY.newSQLError(e);
+			return responseFactory.newSQLError(e);
 		}
-		return null;
 	}
 
 }

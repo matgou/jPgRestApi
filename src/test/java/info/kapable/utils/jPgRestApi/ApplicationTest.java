@@ -1,18 +1,16 @@
 package info.kapable.utils.jPgRestApi;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import junit.framework.TestCase;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.After;
+import org.junit.Before;
 
 public class ApplicationTest {
 	
@@ -41,49 +39,34 @@ public class ApplicationTest {
 	}
 	
 	/**
-	 * Send request to create table
+	 * Query database to create table
 	 * 
 	 * @param tableName
 	 */
 	protected void CreateTable(String tableName) {
-	    client = HttpClients.createDefault();
-
-		HttpPut putRequest = new HttpPut("http://localhost:8080/tables");
 		try {
-			StringEntity input = new StringEntity("{" 
-					+ "\"name\": \"" + tableName + "\", " 
-					+ "\"column\": {"
-					+ "		\"id\":\"INTEGER NOT NULL\"," 
-					+ "		\"description\":\"VARCHAR(25)\"," 
-					+ "     \"submission_date\": \"DATE\""
-					+ "}" 
-					+ "}");
-
-			input.setContentType("application/json");
-			putRequest.setEntity(input);
-			client.execute(putRequest);
-		} catch (IOException e) {
+			Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:jPgRestApi", "sa", "sa");
+			Statement state = conn.createStatement();
+			state.executeQuery("CREATE TABLE " + tableName + " ( id INTEGER NOT NULL,description VARCHAR(25),submission_date DATE );");
+		} catch (SQLException e) {
 			e.printStackTrace();
-			fail("IOException during put");
+			fail("Failed to init table");
 		}
 	}
 
+	/**
+	 * Query database to insert data
+	 * 
+	 * @param tableName
+	 */
 	protected void InsertData(String tableName, int id, String description, String date) {
-	    client = HttpClients.createDefault();
-		HttpPost postRequest = new HttpPost("http://localhost:8080/data/" + tableName);
 		try {
-			StringEntity input = new StringEntity("{" 
-					+ "\"description\": \"" + description + "\", "
-					+ "\"id\": " + id + ","
-					+ "\"submission_date\": \"" + date + "\" "
-					+ "}");
-
-			input.setContentType("application/json");
-			postRequest.setEntity(input);
-			client.execute(postRequest);
-		} catch (IOException e) {
+			Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:jPgRestApi", "sa", "sa");
+			Statement state = conn.createStatement();
+			state.executeQuery("INSERT INTO " + tableName + " (submission_date, description, id) VALUES ('" + date + "', '" + description + "', " + id +")");
+		} catch (SQLException e) {
 			e.printStackTrace();
-			fail("IOException during put");
+			fail("Failed to init table");
 		}
 	}
 }

@@ -6,6 +6,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +90,33 @@ public class DBConnexion {
 		LOG.debug("Executing query : " + sql);
 	    Statement state = conn.createStatement();
 	    return state.executeQuery(sql);
+	}
+
+	/**
+	 * Convert a SQL ResultSet to a List
+	 * 
+	 * @param data
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<Object> resultSetToList(ResultSet data) throws SQLException {
+		ResultSetMetaData metadata = data.getMetaData();		
+		List<Object> allData = new ArrayList<Object>();
+		while(data.next()) {
+			Map<String, Object> aData = new HashMap<String, Object>();
+			for(int i = 1; i <= metadata.getColumnCount(); i++) {
+				if (metadata.getColumnType(i) == java.sql.Types.INTEGER) {
+					aData.put(metadata.getColumnLabel(i), data.getInt(i));
+				} else if (metadata.getColumnType(i) == java.sql.Types.DATE) {
+					aData.put(metadata.getColumnLabel(i), data.getDate(i));
+				} else {
+					aData.put(metadata.getColumnLabel(i), data.getString(i));
+				}
+			}
+			allData.add(aData);
+		}
+		
+		return allData;
 	}
 	
 	

@@ -22,7 +22,7 @@ public abstract class Controller {
 
 	protected DBConnexion DB;
 
-	protected ResponseFactory RESPONSE_FACTORY;
+	protected ResponseFactory responseFactory;
 	
 	public abstract Response process(String uri, Map<String, String> headers,
 			Map<String, String> parms, InputStream data) throws RequestBodyException;
@@ -34,7 +34,7 @@ public abstract class Controller {
 			LOG.error("SQLException in connexion to database : ", e);
 		}
 		
-		this.RESPONSE_FACTORY = ResponseFactory.getInstance();
+		this.responseFactory = ResponseFactory.getInstance();
 	}
 	/**
 	 * Return string from data

@@ -1,21 +1,28 @@
 package info.kapable.utils.jPgRestApi.Controller;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.either;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import info.kapable.utils.jPgRestApi.ApplicationTest;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Test;
 
-import info.kapable.utils.jPgRestApi.ApplicationTest;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Test PUT on /tables URI This controller must add new table on database
  * 
- * @author matgo
+ * @author mgoulin
  *
  */
 public class GetDataControllerTest extends ApplicationTest {
@@ -24,14 +31,82 @@ public class GetDataControllerTest extends ApplicationTest {
 
 	@Test
 	public void getAllDataTest() {
-		CreateTable("table_test");
-		InsertData("table_test", 1, "hello", "2012-12-12");
-		InsertData("table_test", 2, "world", "2011-12-12");
+		CreateTable("table_test_all_data");
+		InsertData("table_test_all_data", 1, "hello", "2012-12-12");
+		InsertData("table_test_all_data", 2, "world", "2011-12-12");
 		try {
-			HttpGet getRequest = new HttpGet(url + "/table_test");
+			HttpGet getRequest = new HttpGet(url + "/table_test_all_data");
 			HttpResponse response = client.execute(getRequest);
 			assertEquals(response.getStatusLine().getStatusCode(), 200);
-		
+			ObjectMapper mapper = new ObjectMapper();
+
+		    TypeReference<List<Object>> typeRef 
+		            = new TypeReference<List<Object>>() {};
+			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
+			assertEquals(jsonList.size(), 2);
+			
+			@SuppressWarnings("unchecked")
+			Map<String, Object> object = (Map<String, Object>) jsonList.get(0);
+			assertThat((String) object.get("DESCRIPTION"), either(containsString("hello")).or(containsString("world")));
+			
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			fail("ClientProtocolException");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IOException");
+		}
+	}
+	
+	@Test
+	public void getFilterDataTest() {
+		CreateTable("table_test_filter_data");
+		InsertData("table_test_filter_data", 1, "hello", "2012-12-12");
+		InsertData("table_test_filter_data", 2, "world", "2011-12-12");
+		try {
+			HttpGet getRequest = new HttpGet(url + "/table_test_filter_data?id=1");
+			HttpResponse response = client.execute(getRequest);
+			assertEquals(response.getStatusLine().getStatusCode(), 200);
+			ObjectMapper mapper = new ObjectMapper();
+
+		    TypeReference<List<Object>> typeRef 
+		            = new TypeReference<List<Object>>() {};
+			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
+			assertEquals(jsonList.size(), 1);
+			
+			@SuppressWarnings("unchecked")
+			Map<String, Object> object = (Map<String, Object>) jsonList.get(0);
+			assertThat((String) object.get("DESCRIPTION"), containsString("hello"));
+			
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			fail("ClientProtocolException");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IOException");
+		}
+	}
+
+	@Test
+	public void getTextFilterDataTest() {
+		CreateTable("table_test_text_filter_data");
+		InsertData("table_test_text_filter_data", 1, "hello", "2012-12-12");
+		InsertData("table_test_text_filter_data", 2, "world", "2011-12-12");
+		try {
+			HttpGet getRequest = new HttpGet(url + "/table_test_text_filter_data?DESCRIPTION=%25l%25");
+			HttpResponse response = client.execute(getRequest);
+			assertEquals(response.getStatusLine().getStatusCode(), 200);
+			ObjectMapper mapper = new ObjectMapper();
+
+		    TypeReference<List<Object>> typeRef 
+		            = new TypeReference<List<Object>>() {};
+			List<Object> jsonList = mapper.readValue(response.getEntity().getContent(), typeRef);
+			assertEquals(jsonList.size(), 2);
+			
+			@SuppressWarnings("unchecked")
+			Map<String, Object> object = (Map<String, Object>) jsonList.get(0);
+			assertThat((String) object.get("DESCRIPTION"), either(containsString("hello")).or(containsString("world")));
+			
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 			fail("ClientProtocolException");

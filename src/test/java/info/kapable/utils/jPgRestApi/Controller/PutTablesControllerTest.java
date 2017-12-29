@@ -87,7 +87,7 @@ public class PutTablesControllerTest extends ApplicationTest {
 
 			Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:jPgRestApi", "sa", "sa");
 			Statement state = conn.createStatement();
-			ResultSet result = state.executeQuery("SELECT * FROM table_test");
+			state.executeQuery("SELECT * FROM table_test");
 
 		} catch (IOException e) {
 			e.printStackTrace();
