@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class PutTablesControllerTest extends ApplicationTest {
 
-	String url = "http://localhost:8080/tables";
+	String url = "http://localhost:8080/api/tables";
 
 	@Test
 	public void errorInJsonTest() {

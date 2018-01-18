@@ -79,7 +79,8 @@ public class ControllerEngine {
 		String controllerKey = "query." + method.toString().toLowerCase() + ".root";
 		controllerKey = this.findControllerKey(controllerKey, controllerKey, method, uri);
 		LOG.debug("Using controller : " + controllerKey);
-		
+		// Drop /api part in uri
+		uri = uri.replaceAll("^/api", "");
 		try {
 			return this.controllers.get(controllerKey).process(uri, headers, parms, data);
 		} catch (RequestBodyException e) {

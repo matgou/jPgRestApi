@@ -1,5 +1,6 @@
 package info.kapable.utils.jPgRestApi;
 import static org.junit.Assert.fail;
+import info.kapable.utils.jPgRestApi.Controller.GetTablesController;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,8 +12,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApplicationTest {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ApplicationTest.class);
 	
 	protected CloseableHttpClient client;
 	/**
@@ -47,7 +52,9 @@ public class ApplicationTest {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:jPgRestApi", "sa", "sa");
 			Statement state = conn.createStatement();
-			state.executeQuery("CREATE TABLE " + tableName + " ( id INTEGER NOT NULL,description VARCHAR(25),submission_date DATE );");
+			String query = "CREATE TABLE " + tableName + " ( id INTEGER NOT NULL,description VARCHAR(25),submission_date DATE );";
+			LOG.info("Create table query : " + query);
+			state.executeQuery(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			fail("Failed to init table");
@@ -63,7 +70,9 @@ public class ApplicationTest {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:jPgRestApi", "sa", "sa");
 			Statement state = conn.createStatement();
-			state.executeQuery("INSERT INTO " + tableName + " (submission_date, description, id) VALUES ('" + date + "', '" + description + "', " + id +")");
+			String query = "INSERT INTO " + tableName + " (submission_date, description, id) VALUES ('" + date + "', '" + description + "', " + id +")";
+			LOG.info("INSERT query : " + query);
+			state.executeQuery(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			fail("Failed to init table");

@@ -1,0 +1,17 @@
+<div>
+  <h3>Liste des tables :</h3>
+  <table class="table">
+  	<thead>
+  		<tr>
+  			<td>Nom du sch&eacute;ma</td>
+	  		<td>Nom de la table</td>
+  		</tr>
+  	</thead>
+  	<tbody>
+	  <tr *ngFor="let table of tables">
+	    <td>{{table.table_schema}}</td>
+	    <td><a routerLink="/data/{{ table.table_name }}" routerLinkActive="active">{{table.table_name}}</a></td>
+	  </tr>
+	</tbody>
+  </table>
+</div>

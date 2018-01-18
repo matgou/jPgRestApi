@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class QueryDataControllerTest extends ApplicationTest {
 
-	String url = "http://localhost:8080/query";
+	String url = "http://localhost:8080/api/query";
 
 	@Test
 	public void queryWithJoinTest() {

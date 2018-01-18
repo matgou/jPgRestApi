@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class GetDataControllerTest extends ApplicationTest {
 
-	String url = "http://localhost:8080/data";
+	String url = "http://localhost:8080/api/data";
 
 	@Test
 	public void getAllDataTest() {
